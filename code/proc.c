@@ -633,21 +633,21 @@ char* getstateproc(int num)
   switch (num)
   {
   case 0:
-    return "UNUSED\0";
+    return "-UNUSED\0";
   case 1:
-    return "EMBRYO\0";
+    return "-EMBRYO\0";
     break;
   case 2:
     return "SLEEPING\0";
     break;
   case 3:
-    return"RUNNABLE\0";
+    return "RUNNABLE\0";
     break;
   case 4:
-    return "RUNNING\0";
+    return "-RUNNING\0";
     break;
   case 5:
-    return "ZOMBIE\0";
+    return "-ZOMBIE\0";
     break;
   default:
     break;
@@ -658,11 +658,11 @@ char* getstateproc(int num)
 // *****NEW-system call for printing ptable
 void printprocs(void)
 {
-  cprintf("name    pid     state     queue_level     cycle     arrivel     HRNN\n");
-  cprintf("--------------------------------------------------------------------\n");
+  cprintf("name\tpid\tstate\tqueue_level\tcycle\tarrivel\tHRNN\n");
+  cprintf("-----------------------------------------------------------------\n");
   for(struct proc * p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->state == 0)
       continue;
-    cprintf("%s    %d     %s     %d     cycle     arrivel      HRNN\n", p->name, p->pid, getstateproc(p->state),p->priority);
+    cprintf("%s\t%d\t%s\t%d\tcycle\tarrivel\tHRNN\n", p->name, p->pid, getstateproc(p->state),p->priority);
   }
 }
