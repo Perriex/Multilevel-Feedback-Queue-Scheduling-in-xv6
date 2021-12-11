@@ -628,41 +628,41 @@ procdump(void)
 
 
 // *****NEW-system call for printing ptable
-char* getstateproc(char name[10], int num)
+char* getstateproc(int num)
 {
   switch (num)
   {
   case 0:
-    safestrcpy(name, "UNUSED\0", sizeof(6));
-    break;
+    return "UNUSED\0";
   case 1:
-    safestrcpy(name, "EMBRYO\0", sizeof(6));
+    return "EMBRYO\0";
     break;
   case 2:
-    safestrcpy(name, "SLEEPING\0", sizeof(9));
+    return "SLEEPING\0";
     break;
   case 3:
-    safestrcpy(name, "RUNNABLE\0", sizeof(9));
+    return"RUNNABLE\0";
     break;
   case 4:
-    safestrcpy(name, "RUNNING\0", sizeof(8));
+    return "RUNNING\0";
     break;
   case 5:
-    safestrcpy(name, "ZOMBIE\0", sizeof(7));
+    return "ZOMBIE\0";
     break;
   default:
     break;
   }
-  return name;
+  return "NONE";
 }
 
 // *****NEW-system call for printing ptable
 void printprocs(void)
 {
-  cprintf("name         pid       state       queue_level       cycle       arrivel       HRNN\n");
-  cprintf("-----------------------------------------------------------------------------------\n");
+  cprintf("name    pid     state     queue_level     cycle     arrivel     HRNN\n");
+  cprintf("--------------------------------------------------------------------\n");
   for(struct proc * p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-    char name[10];
-    cprintf("%s          %d         %s         %d        cycle       arrivel       HRNN\n", p->name, p->pid, getstateproc(name,p->state),p->priority);
+    if(p->state == 0)
+      continue;
+    cprintf("%s    %d     %s     %d     cycle     arrivel      HRNN\n", p->name, p->pid, getstateproc(p->state),p->priority);
   }
 }
