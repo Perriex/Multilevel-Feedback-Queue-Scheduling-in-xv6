@@ -398,6 +398,12 @@ int lcfssched()
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
+
+int allsched()
+{
+  return RRsched() || lcfssched();
+}
+
 void
 scheduler(void)
 {
@@ -408,10 +414,9 @@ scheduler(void)
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
 
-    //RRsched(); 
+    allsched();
     
     release(&ptable.lock);
-
   }
 }
 
