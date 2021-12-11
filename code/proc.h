@@ -50,7 +50,7 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
   uint age;
-  uint prioroty;
+  uint priority;
   uint p2inittime;
 };
 
