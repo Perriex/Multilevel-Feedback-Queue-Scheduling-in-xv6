@@ -6,6 +6,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "date.h"
 
 struct {
   struct spinlock lock;
@@ -65,6 +66,15 @@ myproc(void) {
   return p;
 }
 
+struct proc*
+getprocbypid(int pid) {
+  struct proc *p = 0;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    if (p->pid == pid)
+      break;
+  return p;
+}
+
 //PAGEBREAK: 32
 // Look in the process table for an UNUSED proc.
 // If found, change state to EMBRYO and initialize
@@ -111,7 +121,8 @@ found:
   p->context = (struct context*)sp;
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
-
+  p->age = 0;
+  p->priority = 2;
   return p;
 }
 
@@ -346,6 +357,39 @@ int RRsched(void){
 }
 
 //____________________ new scheduler with three level ________________________///
+uint getinttime(struct rtcdate* date)
+{
+  return date->year * 10000000000 
+    + date->month   * 100000000 
+    + date->day     * 1000000
+    + date->hour    * 10000
+    + date->minute  * 100
+    + date->second;
+}
+
+int lcfssched()
+{
+  struct proc *p = 0, *choice = 0;
+  
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    if (p->priority == 2 && p->state == RUNNABLE)
+    {
+      if (choice == 0)
+        choice = p;
+      else if (choice->p2inittime < p->p2inittime)
+      {
+        choice = p;
+      }
+    }
+
+  if (choice != 0)
+  {
+    //run
+  }
+
+  return choice != 0;   
+}
+
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
@@ -409,7 +453,14 @@ yield(void)
 
 void changepriority(int pid, uint prioroty)
 {
-  //todo implement;
+  struct rtcdate date;
+  struct proc* p = getprocbypid(pid);
+  if (p == 0)
+    return;
+  
+  cmostime(&date);
+  p->p2inittime = getinttime(&date);
+  p->priority = prioroty;
 }
 
 void age(void)
