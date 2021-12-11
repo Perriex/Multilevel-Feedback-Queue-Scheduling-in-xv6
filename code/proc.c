@@ -462,10 +462,12 @@ void changepriority(int pid, uint prioroty)
   struct proc* p = getprocbypid(pid);
   if (p == 0)
     return;
-  
+
+  acquire(&ptable.lock); 
   cmostime(&date);
   p->p2inittime = getinttime(&date);
   p->priority = prioroty;
+  release(&ptable.lock);
 }
 
 void age(void)

@@ -7,6 +7,18 @@
 #include "mmu.h"
 #include "proc.h"
 
+int 
+sys_chpp(void)
+{
+  int pid, priority;
+
+  if(argint(0, &pid) < 0 && argint(1, &priority) < 0)
+    return -1;
+
+  changepriority(pid, priority);
+  return 0;
+}
+
 int
 sys_fork(void)
 {
