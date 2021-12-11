@@ -121,6 +121,7 @@ int             wait(void);
 void            wakeup(void*);
 void            yield(void);
 void            age(void);
+void            changepriority(int pid, uint prioroty);
 
 //new - syscall for print
 void            printprocs(void); 
