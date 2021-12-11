@@ -351,7 +351,9 @@ int RRsched(void){
       continue;
     //select for running
     contextswitch(p);
+    empty = 1;
   }
+  return empty;
 }
 
 //____________________ new scheduler with three level ________________________///
@@ -406,7 +408,7 @@ scheduler(void)
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
 
-    // RRsched(); 
+    //RRsched(); 
     
     release(&ptable.lock);
 
