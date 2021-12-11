@@ -122,6 +122,9 @@ void            wakeup(void*);
 void            yield(void);
 void            age(void);
 
+//new - syscall for print
+void            printprocs(void); 
+
 // swtch.S
 void            swtch(struct context**, struct context*);
 

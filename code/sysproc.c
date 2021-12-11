@@ -89,3 +89,10 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+// *****NEW - syscall for print
+int sys_printprocs(void)
+{
+  printprocs();
+  return 0;
+}
