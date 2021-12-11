@@ -347,7 +347,7 @@ void contextswitch(struct proc * p){
 int RRsched(void){
   int empty = 0;
   for(struct proc * p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-    if(p->state != RUNNABLE && p->priority != 1)
+    if(p->state != RUNNABLE || p->priority != 1)
       continue;
     //select for running
     contextswitch(p);
