@@ -391,6 +391,25 @@ yield(void)
   release(&ptable.lock);
 }
 
+void changepriority(int pid, uint prioroty)
+{
+  //todo implement;
+}
+
+void age(void)
+{
+  struct proc *p;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->state == RUNNABLE)
+        p->age++;
+
+      if(p->age >= PROMOTEAGE && p->prioroty > 1)
+      {
+        changepriority(p->pid, p->prioroty - 1);
+      }
+  }
+}
+
 // A fork child's very first scheduling by scheduler()
 // will swtch here.  "Return" to user space.
 void
