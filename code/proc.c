@@ -384,7 +384,7 @@ int lcfssched()
 
   if (choice != 0)
   {
-    //run
+    contextswitch(choice);
   }
 
   return choice != 0;   
