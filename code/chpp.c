@@ -9,5 +9,6 @@ main(int argc, char *argv[])
     printf(1, "chpp [pid] [proroty]=1|2|3");
     return -1;
   }
-  return chpp(atoi(argv[1]), atoi(argv[2]));
+  chpp(atoi(argv[1]), atoi(argv[2]));
+  exit();
 }
