@@ -487,6 +487,9 @@ sched(void)
 void
 yield(void)
 {
+  if (myproc()-> priority > 1)
+    return;
+
   acquire(&ptable.lock);  //DOC: yieldlock
   myproc()->state = RUNNABLE;
   sched();
