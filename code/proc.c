@@ -384,9 +384,14 @@ int lcfssched()
   return choice != 0;   
 }
 
+float gethrrn(uint currenttime, struct proc *p)
+{
+  return 1.0 * (p->cyclecnt + currenttime - p->p2inittime) / p->cyclecnt;
+}
+
 float getmhrrn(uint currenttime, struct proc *p)
 {
-  float hrrn = 1.0 * (p->cyclecnt + currenttime - p->p2inittime) / p->cyclecnt;
+  float hrrn = gethrrn(currenttime, p);
   return 0.5 * (hrrn + p->hrrnpriority);
 }
 
@@ -703,7 +708,7 @@ void printprocs(void)
 {
   int currenttime = ticks;
   cprintf("name");
-  printwhitespace(16);
+  printwhitespace(12);
   cprintf("pid");
   printwhitespace(3);
   cprintf("state");
@@ -714,6 +719,8 @@ void printprocs(void)
   printwhitespace(3);
   cprintf("arrival");
   printwhitespace(3);
+  cprintf("HRRN");
+  printwhitespace(5);
   cprintf("MHRRN\n");
   printwhitespace(4);
   cprintf("-----------------------------------------------------------------------------\n");
@@ -721,7 +728,7 @@ void printprocs(void)
     if(p->state == 0)
       continue;
     cprintf("%s", p->name);
-    printwhitespace(20 - strlen(p->name));
+    printwhitespace(16 - strlen(p->name));
     cprintf("%d", p->pid);
     printwhitespace(6 - intlen(p->pid));
     cprintf("%s", getstateproc(p->state));
@@ -732,6 +739,8 @@ void printprocs(void)
     printwhitespace(8 - intlen(p->cyclecnt));
     cprintf("%d", p->p2inittime);
     printwhitespace(10 - intlen(p->p2inittime));
+    cprintf("%d", (int)gethrrn(currenttime, p));
+    printwhitespace(9 - intlen((int)gethrrn(currenttime, p)));
     cprintf("%d\n", (int)getmhrrn(currenttime, p));
   }
 }
