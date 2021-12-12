@@ -122,6 +122,8 @@ void            wakeup(void*);
 void            yield(void);
 void            age(void);
 void            changepriority(int pid, uint prioroty);
+void            setprochrrnpriority(int pid, uint hrrnpriority);
+void            setsyshrrnpriority(uint hrrnpriority);
 
 //new - syscall for print
 void            printprocs(void); 

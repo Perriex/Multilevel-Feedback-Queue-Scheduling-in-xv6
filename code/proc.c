@@ -704,7 +704,7 @@ void printprocs(void)
   }
 }
 
-void setprochrrnpriority(int pid, int hrrnpriority)
+void setprochrrnpriority(int pid, uint hrrnpriority)
 {
   for(struct proc * p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->pid == pid)
@@ -712,7 +712,7 @@ void setprochrrnpriority(int pid, int hrrnpriority)
   }
 }
 
-void setsyshrrnpriority(int hrrnpriority)
+void setsyshrrnpriority(uint hrrnpriority)
 {
   for(struct proc * p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     p->hrrnpriority = hrrnpriority;

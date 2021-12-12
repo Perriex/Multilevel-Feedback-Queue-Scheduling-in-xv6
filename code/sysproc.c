@@ -8,7 +8,7 @@
 #include "proc.h"
 
 int 
-sys_chpp(void)
+sys_chpp  (void)
 {
   int pid, priority;
 
@@ -116,6 +116,7 @@ int sys_setprocparam(void)
   if(argint(0, &pid) < 0 || argint(1, &hrrnpriority) < 0)
     return -1;
   setprochrrnpriority(pid, hrrnpriority);
+  return 0;
 }
 
 int sys_setsysparam(void)
@@ -125,4 +126,5 @@ int sys_setsysparam(void)
   if(argint(0, &hrrnpriority) < 0)
     return -1;
   setsyshrrnpriority(hrrnpriority);
+  return 0;
 }
