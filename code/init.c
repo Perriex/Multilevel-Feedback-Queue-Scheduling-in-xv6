@@ -12,6 +12,8 @@ main(void)
 {
   int pid, wpid;
 
+  chpp(1, 1);
+
   if(open("console", O_RDWR) < 0){
     mknod("console", 1, 1);
     open("console", O_RDWR);
@@ -31,6 +33,7 @@ main(void)
       printf(1, "init: exec sh failed\n");
       exit();
     }
+    chpp(pid, 1);
     while((wpid=wait()) >= 0 && wpid != pid)
       printf(1, "zombie!\n");
   }
