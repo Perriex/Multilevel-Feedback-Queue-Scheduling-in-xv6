@@ -121,10 +121,12 @@ found:
   p->context = (struct context*)sp;
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
+  p->p2inittime = ticks;
   p->age = 0;
   p->priority = 2;
   p->cyclecnt = 1;
   p->hrrnpriority = 1;
+  //if(p->pid > 8)cprintf("%d %d\n", p->pid, p->p2inittime);
   return p;
 }
 
@@ -359,17 +361,6 @@ int RRsched(void){
   return empty;
 }
 
-//____________________ new scheduler with three level ________________________///
-uint getinttime(struct rtcdate* date)
-{
-  return date->year * 10000000000 
-    + date->month   * 100000000 
-    + date->day     * 1000000
-    + date->hour    * 10000
-    + date->minute  * 100
-    + date->second;
-}
-
 int lcfssched()
 {
   struct proc *p = 0, *choice = 0;
@@ -402,11 +393,9 @@ float getmhrrn(uint currenttime, struct proc *p)
 int mhrrnsched()
 {
   struct proc *p = 0, *choice = 0;
-  struct rtcdate date;
   uint currenttime;
 
-  cmostime(&date);
-  currenttime = getinttime(&date);
+  currenttime = ticks;
   
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
     if (p->priority == 3 && p->state == RUNNABLE)
@@ -498,14 +487,12 @@ yield(void)
 
 void changepriority(int pid, uint prioroty)
 {
-  struct rtcdate date;
   struct proc* p = getprocbypid(pid);
   if (p == 0)
     return;
 
   acquire(&ptable.lock); 
-  cmostime(&date);
-  p->p2inittime = getinttime(&date);
+  p->p2inittime = ticks;
   p->priority = prioroty;
   release(&ptable.lock);
 }
@@ -673,21 +660,21 @@ char* getstateproc(int num)
   switch (num)
   {
   case 0:
-    return "-UNUSED\0";
+    return "UNUSED";
   case 1:
-    return "-EMBRYO\0";
+    return "EMBRYO";
     break;
   case 2:
-    return "SLEEPING\0";
+    return "SLEEPING";
     break;
   case 3:
-    return "RUNNABLE\0";
+    return "RUNNABLE";
     break;
   case 4:
-    return "-RUNNING\0";
+    return "RUNNING";
     break;
   case 5:
-    return "-ZOMBIE\0";
+    return "ZOMBIE";
     break;
   default:
     break;
@@ -695,15 +682,60 @@ char* getstateproc(int num)
   return "NONE";
 }
 
+void printwhitespace(int num)
+{
+  char ws[30];
+  strncpy(ws, "                              ", 30);
+  ws[num] = '\0';
+  cprintf("%s", ws);
+}
+
+int intlen(uint num)
+{
+  if(num == 0) return 1;
+  int res = 0;
+  while(num){
+    res++;
+    num /= 10;
+  }
+  return res;
+}
+
 // *****NEW-system call for printing ptable
 void printprocs(void)
 {
-  cprintf("name\tpid\tstate\tqueue_level\tcycle\tarrivel\tHRNN\n");
-  cprintf("-----------------------------------------------------------------\n");
+  int currenttime = ticks;
+  cprintf("name");
+  printwhitespace(16);
+  cprintf("pid");
+  printwhitespace(3);
+  cprintf("state");
+  printwhitespace(5);
+  cprintf("queue_level");
+  printwhitespace(3);
+  cprintf("cycle");
+  printwhitespace(3);
+  cprintf("arrival");
+  printwhitespace(3);
+  cprintf("MHRRN\n");
+  printwhitespace(4);
+  cprintf("-----------------------------------------------------------------------------\n");
   for(struct proc * p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->state == 0)
       continue;
-    cprintf("%s\t%d\t%s\t%d\tcycle\tarrivel\tHRNN\n", p->name, p->pid, getstateproc(p->state),p->priority);
+    cprintf("%s", p->name);
+    printwhitespace(20 - strlen(p->name));
+    cprintf("%d", p->pid);
+    printwhitespace(6 - intlen(p->pid));
+    cprintf("%s", getstateproc(p->state));
+    printwhitespace(10 - strlen(getstateproc(p->state)));
+    cprintf("%d", p->priority);
+    printwhitespace(14 - intlen(p->priority));
+    cprintf("%d", p->cyclecnt);
+    printwhitespace(8 - intlen(p->cyclecnt));
+    cprintf("%d", p->p2inittime);
+    printwhitespace(10 - intlen(p->p2inittime));
+    cprintf("%d\n", (int)getmhrrn(currenttime, p));
   }
 }
 
