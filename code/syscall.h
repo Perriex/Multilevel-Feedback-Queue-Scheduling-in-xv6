@@ -23,3 +23,5 @@
 
 #define SYS_printprocs  23
 #define SYS_chpp   22
+#define SYS_setprocparam 24
+#define SYS_setsysparam 25

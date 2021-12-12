@@ -108,3 +108,21 @@ int sys_printprocs(void)
   printprocs();
   return 0;
 }
+
+int sys_setprocparam(void)
+{
+  int pid, hrrnpriority;
+  
+  if(argint(0, &pid) < 0 || argint(1, &hrrnpriority) < 0)
+    return -1;
+  setprochrrnpriority(pid, hrrnpriority);
+}
+
+int sys_setsysparam(void)
+{
+  int hrrnpriority;
+  
+  if(argint(0, &hrrnpriority) < 0)
+    return -1;
+  setsyshrrnpriority(hrrnpriority);
+}

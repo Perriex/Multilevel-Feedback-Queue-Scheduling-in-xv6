@@ -52,6 +52,8 @@ struct proc {
   uint age;//new
   uint priority;//new
   uint p2inittime;//new
+  uint cyclecnt;//new
+  uint hrrnpriority;//new
 };
 
 // Process memory is laid out contiguously, low addresses first:

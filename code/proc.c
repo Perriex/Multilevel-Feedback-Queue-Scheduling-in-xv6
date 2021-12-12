@@ -123,6 +123,8 @@ found:
   p->context->eip = (uint)forkret;
   p->age = 0;
   p->priority = 2;
+  p->cyclecnt = 1;
+  p->hrrnpriority = 1;
   return p;
 }
 
@@ -334,6 +336,7 @@ void contextswitch(struct proc * p){
   p->state = RUNNING;
 
   p->age = 0; // *****after running cycle is reset to zero
+  p->cyclecnt++; // *****increase number of execution cycles
 
   swtch(&(c->scheduler), p->context);
   switchkvm();
@@ -390,6 +393,40 @@ int lcfssched()
   return choice != 0;   
 }
 
+float getmhrrn(uint currenttime, struct proc *p)
+{
+  float hrrn = 1.0 * (p->cyclecnt + currenttime - p->p2inittime) / p->cyclecnt;
+  return 0.5 * (hrrn + p->hrrnpriority);
+}
+
+int mhrrnsched()
+{
+  struct proc *p = 0, *choice = 0;
+  struct rtcdate date;
+  uint currenttime;
+
+  cmostime(&date);
+  currenttime = getinttime(&date);
+  
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+    if (p->priority == 3 && p->state == RUNNABLE)
+    {
+      if (choice == 0)
+        choice = p;
+      else if (getmhrrn(currenttime, choice) < getmhrrn(currenttime,p))
+      {
+        choice = p;
+      }
+    }
+
+  if (choice != 0)
+  {
+    contextswitch(choice);
+  }
+
+  return choice != 0;   
+}
+
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
@@ -401,7 +438,7 @@ int lcfssched()
 
 int allsched()
 {
-  return RRsched() || lcfssched();
+  return RRsched() || lcfssched() || mhrrnsched();
 }
 
 void
@@ -418,7 +455,7 @@ scheduler(void)
     
     release(&ptable.lock);
   }
-}
+} 
 
 // Enter scheduler.  Must hold only ptable.lock
 // and have changed proc->state. Saves and restores
@@ -664,5 +701,20 @@ void printprocs(void)
     if(p->state == 0)
       continue;
     cprintf("%s\t%d\t%s\t%d\tcycle\tarrivel\tHRNN\n", p->name, p->pid, getstateproc(p->state),p->priority);
+  }
+}
+
+void setprochrrnpriority(int pid, int hrrnpriority)
+{
+  for(struct proc * p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->pid == pid)
+      p->hrrnpriority = hrrnpriority;
+  }
+}
+
+void setsyshrrnpriority(int hrrnpriority)
+{
+  for(struct proc * p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    p->hrrnpriority = hrrnpriority;
   }
 }

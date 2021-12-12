@@ -25,6 +25,8 @@ int sleep(int);
 int uptime(void);
 int printprocs(void);
 int chpp(int, int);
+int setprocparam(int, int);
+int setsysparam(int);
 
 // ulib.c
 int stat(const char*, struct stat*);
